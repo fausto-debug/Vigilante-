@@ -20,14 +20,14 @@ import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-
 // Você encontra esses dados em: Firebase Console > Configurações do projeto
 // (ícone de engrenagem) > Seus apps > SDK setup and configuration.
 const firebaseConfig = {
-  apiKey: "AIzaSyDSSDEJ0Nu1-QBV_fKnuXQ7q8ViPzK8QJk",
-  authDomain: "vigilante-8f45e.firebaseapp.com",
-  projectId: "vigilante-8f45e",
-  storageBucket: "vigilante-8f45e.firebasestorage.app",
-  messagingSenderId: "458897784896",
-  appId: "1:458897784896:web:56bb8c8884c78c9a2a9fa5"
+  apiKey: "AIzaSyAyP-Hxwbc9WxjSs0GiAkH9UtsEtckWcpk",
+  authDomain: "vigilante-painel.firebaseapp.com",
+  databaseURL: "https://vigilante-painel-default-rtdb.firebaseio.com",
+  projectId: "vigilante-painel",
+  storageBucket: "vigilante-painel.firebasestorage.app",
+  messagingSenderId: "679586336318",
+  appId: "1:679586336318:web:2ef2aedce5e42b49c4cb6f"
 };
-
 const firebaseApp = initializeApp(firebaseConfig);
 
 export const auth = getAuth(firebaseApp);
