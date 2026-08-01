@@ -3,11 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Vigilante — painel pessoal de produtividade: financeiro, hábitos, contas, notas e treinos.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#09090a">
 <title>Vigilante — Painel Pessoal</title>
+
+<!-- Resource hints: adianta a conexão com os domínios usados pelo Firebase e pelas fontes -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="dns-prefetch" href="https://firestore.googleapis.com">
+<link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com">
+<link rel="dns-prefetch" href="https://firebasestorage.googleapis.com">
+
+<!-- Só os pesos de fonte realmente usados na interface (reduz o payload) -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+
+<!-- Modulepreload: permite ao navegador buscar os módulos JS em paralelo,
+     em vez de descobrir cada import somente depois de baixar o anterior -->
+<link rel="modulepreload" href="firebase.js">
+<link rel="modulepreload" href="auth.js">
+<link rel="modulepreload" href="database.js">
+<link rel="modulepreload" href="storage.js">
+<link rel="modulepreload" href="app.js">
 </head>
 <body data-anim="on">
 <div class="spotlight-layer"><div class="spotlight-beam"></div></div>

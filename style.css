@@ -90,6 +90,7 @@ img{ max-width:100%; display:block; }
   animation: sweep 16s linear infinite;
   opacity:.65;
   transform: translateX(-50%);
+  will-change: transform;
 }
 @keyframes sweep{ to{ transform: translateX(-50%) rotate(360deg); } }
 
@@ -206,6 +207,7 @@ section.view.active{ display:block; animation: fadein var(--dur-slow) var(--ease
   box-shadow: var(--shadow-soft);
   padding:22px;
   transition: box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  contain: layout style;
 }
 .grid{ display:grid; gap:18px; }
 .grid.cols-5{ grid-template-columns:repeat(5,1fr); }

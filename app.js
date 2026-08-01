@@ -78,10 +78,10 @@ function showScreen(id) {
   document.getElementById(id).classList.add("active");
 }
 
-document.getElementById("goSignup").addEventListener("click", () => showScreen("screenSignup"));
-document.getElementById("goLoginFromSignup").addEventListener("click", () => showScreen("screenLogin"));
-document.getElementById("goForgot").addEventListener("click", () => showScreen("screenForgot"));
-document.getElementById("goLoginFromForgot").addEventListener("click", () => showScreen("screenLogin"));
+document.getElementById("goSignup")?.addEventListener("click", () => showScreen("screenSignup"));
+document.getElementById("goLoginFromSignup")?.addEventListener("click", () => showScreen("screenLogin"));
+document.getElementById("goForgot")?.addEventListener("click", () => showScreen("screenForgot"));
+document.getElementById("goLoginFromForgot")?.addEventListener("click", () => showScreen("screenLogin"));
 
 // Ativa/desativa o estado visual de carregamento em um botão de formulário
 // (evita duplo-clique e dá feedback imediato ao usuário).
@@ -96,7 +96,7 @@ async function withButtonLoading(button, task) {
   }
 }
 
-document.getElementById("loginForm").addEventListener("submit", async (e) => {
+document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const errEl = document.getElementById("loginError");
   errEl.classList.remove("show");
@@ -114,7 +114,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   });
 });
 
-document.getElementById("signupForm").addEventListener("submit", async (e) => {
+document.getElementById("signupForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const errEl = document.getElementById("signupError");
   errEl.classList.remove("show");
@@ -138,7 +138,7 @@ document.getElementById("signupForm").addEventListener("submit", async (e) => {
   });
 });
 
-document.getElementById("forgotForm").addEventListener("submit", async (e) => {
+document.getElementById("forgotForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const errEl = document.getElementById("forgotError");
   const okEl = document.getElementById("forgotSuccess");
@@ -160,8 +160,8 @@ document.getElementById("forgotForm").addEventListener("submit", async (e) => {
 // Reseta a UI da sidebar para o estado padrão — corrige o bug em que o menu
 // lateral podia continuar aberto (mobile) ou numa view antiga após o logout.
 function resetShellUI() {
-  document.getElementById("sidebar").classList.remove("mobile-open");
-  document.getElementById("sidebarBackdrop").classList.remove("show");
+  document.getElementById("sidebar")?.classList.remove("mobile-open");
+  document.getElementById("sidebarBackdrop")?.classList.remove("show");
   document.querySelectorAll(".nav-item").forEach((b) => b.classList.remove("active"));
   const dashBtn = document.querySelector('.nav-item[data-view="dashboard"]');
   if (dashBtn) { dashBtn.classList.add("active"); dashBtn.setAttribute("aria-current", "page"); }
@@ -236,7 +236,7 @@ document.querySelectorAll(".nav-item").forEach((btn) => {
     renderAll();
   });
 });
-document.getElementById("collapseBtn").addEventListener("click", () => {
+document.getElementById("collapseBtn")?.addEventListener("click", () => {
   const sb = document.getElementById("sidebar");
   const btn = document.getElementById("collapseBtn");
   sb.classList.toggle("collapsed");
@@ -245,20 +245,21 @@ document.getElementById("collapseBtn").addEventListener("click", () => {
   btn.setAttribute("aria-expanded", String(!collapsed));
 });
 function openMobileSidebar() {
-  document.getElementById("sidebar").classList.add("mobile-open");
-  document.getElementById("sidebarBackdrop").classList.add("show");
+  document.getElementById("sidebar")?.classList.add("mobile-open");
+  document.getElementById("sidebarBackdrop")?.classList.add("show");
 }
 function closeMobileSidebar() {
-  document.getElementById("sidebar").classList.remove("mobile-open");
-  document.getElementById("sidebarBackdrop").classList.remove("show");
+  document.getElementById("sidebar")?.classList.remove("mobile-open");
+  document.getElementById("sidebarBackdrop")?.classList.remove("show");
 }
-document.getElementById("mobileMenuBtn").addEventListener("click", () => {
+document.getElementById("mobileMenuBtn")?.addEventListener("click", () => {
   const sb = document.getElementById("sidebar");
+  if (!sb) return;
   sb.classList.contains("mobile-open") ? closeMobileSidebar() : openMobileSidebar();
 });
-document.getElementById("sidebarBackdrop").addEventListener("click", closeMobileSidebar);
-document.getElementById("exportQuickBtn").addEventListener("click", exportData);
-document.getElementById("logoutBtn").addEventListener("click", logout);
+document.getElementById("sidebarBackdrop")?.addEventListener("click", closeMobileSidebar);
+document.getElementById("exportQuickBtn")?.addEventListener("click", exportData);
+document.getElementById("logoutBtn")?.addEventListener("click", logout);
 window.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
     closeMobileSidebar();
@@ -296,7 +297,7 @@ function closeModal() {
   document.getElementById("modalBackdrop").classList.remove("open");
   if (lastFocusedBeforeModal && typeof lastFocusedBeforeModal.focus === "function") lastFocusedBeforeModal.focus();
 }
-document.getElementById("modalBackdrop").addEventListener("click", (e) => { if (e.target.id === "modalBackdrop") closeModal(); });
+document.getElementById("modalBackdrop")?.addEventListener("click", (e) => { if (e.target.id === "modalBackdrop") closeModal(); });
 window.closeModal = closeModal; // usado pelos botões "Cancelar" gerados via innerHTML
 
 /* =====================================================================
@@ -631,7 +632,11 @@ function renderNotes() {
       </div>
     </div>`).join("") : `<div class="card empty" style="grid-column:1/-1;"><span class="ic">📝</span>Nenhuma nota encontrada</div>`;
 }
-document.getElementById("noteSearch").addEventListener("input", renderNotes);
+let noteSearchTimer = null;
+document.getElementById("noteSearch")?.addEventListener("input", () => {
+  clearTimeout(noteSearchTimer);
+  noteSearchTimer = setTimeout(renderNotes, 120);
+});
 
 /* =====================================================================
    TREINOS
@@ -872,10 +877,10 @@ async function saveProfile() {
 async function setAccent(key) { await updateUserProfile(currentUid, { accent: key }); }
 
 /* ---------- Upload da foto de perfil (Firebase Storage) ---------- */
-document.getElementById("avatarBig").addEventListener("click", () => {
+document.getElementById("avatarBig")?.addEventListener("click", () => {
   document.getElementById("avatarFileInput").click();
 });
-document.getElementById("avatarFileInput").addEventListener("change", async (e) => {
+document.getElementById("avatarFileInput")?.addEventListener("change", async (e) => {
   const file = e.target.files[0];
   e.target.value = ""; // permite selecionar o mesmo arquivo novamente depois
   if (!file) return;
@@ -920,7 +925,7 @@ function exportData() {
   toast("Dados exportados", "success");
 }
 
-document.getElementById("importFile").addEventListener("change", (e) => {
+document.getElementById("importFile")?.addEventListener("change", (e) => {
   const file = e.target.files[0]; if (!file) return;
   const reader = new FileReader();
   reader.onload = async () => {
