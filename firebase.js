@@ -20,12 +20,12 @@ import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-
 // Você encontra esses dados em: Firebase Console > Configurações do projeto
 // (ícone de engrenagem) > Seus apps > SDK setup and configuration.
 const firebaseConfig = {
-  apiKey: "COLE_AQUI_SUA_API_KEY",
-  authDomain: "COLE_AQUI_SEU_PROJETO.firebaseapp.com",
-  projectId: "COLE_AQUI_SEU_PROJETO",
-  storageBucket: "COLE_AQUI_SEU_PROJETO.appspot.com",
-  messagingSenderId: "COLE_AQUI_SEU_SENDER_ID",
-  appId: "COLE_AQUI_SEU_APP_ID"
+  apiKey: "AIzaSyDSSDEJ0Nu1-QBV_fKnuXQ7q8ViPzK8QJk",
+  authDomain: "vigilante-8f45e.firebaseapp.com",
+  projectId: "vigilante-8f45e",
+  storageBucket: "vigilante-8f45e.firebasestorage.app",
+  messagingSenderId: "458897784896",
+  appId: "1:458897784896:web:56bb8c8884c78c9a2a9fa5"
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
