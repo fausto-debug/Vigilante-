@@ -40,9 +40,6 @@
 <!-- Transição leve entre telas (login/cadastro <-> dashboard) -->
 <div id="routeTransition" aria-hidden="true"><div class="spin"></div></div>
 
-<!-- Overlay do menu lateral no mobile -->
-<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
-
 <!-- ============================= LOGIN ============================= -->
 <div class="auth-screen" id="screenLogin">
   <div class="auth-box">
@@ -96,6 +93,10 @@
 
 <!-- ============================= APP (PROTEGIDO) ============================= -->
 <div class="app" id="appRoot">
+  <!-- Overlay do menu lateral no mobile — precisa estar DENTRO do #appRoot
+       para ficar no mesmo grupo de empilhamento do menu lateral (senão ele
+       cobre o menu inteiro no celular, em vez de ficar atrás dele) -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
   <!-- ============================= SIDEBAR ============================= -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-head">
