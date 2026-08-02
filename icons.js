@@ -3,13 +3,14 @@
 // Local: raiz do projeto (mesma pasta do index.html)
 //
 // Responsabilidade: um único conjunto de ícones SVG (linha fina,
-// minimalista) usado em todo o painel, no lugar de emojis. Todos
-// usam stroke="currentColor", então herdam a cor do elemento pai
-// automaticamente (funcionam com qualquer cor de destaque).
+// minimalista) usado em toda a interface. Todos usam
+// stroke="currentColor", então herdam a cor do elemento pai —
+// nenhum ícone precisa de cor fixa no código.
+//
+// Uso: import { icon } from "./icons.js";  icon("trash", 16)
 // =============================================================
 
 const PATHS = {
-  // navegação
   home: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20a1 1 0 0 0 1 1H9a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h2.5a1 1 0 0 0 1-1V9.5"/>',
   wallet: '<path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h13A1.5 1.5 0 0 1 19 7.5V9H4.5A1.5 1.5 0 0 1 3 7.5Z"/><path d="M3 9v9a1.5 1.5 0 0 0 1.5 1.5h15A1.5 1.5 0 0 0 21 18V10.5A1.5 1.5 0 0 0 19.5 9H4.5A1.5 1.5 0 0 1 3 7.5"/><circle cx="16.5" cy="14" r="1.25"/>',
   vault: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="0.8" fill="currentColor" stroke="none"/><path d="M7 4v2M17 4v2M7 18v2M17 18v2"/>',
@@ -36,13 +37,19 @@ const PATHS = {
   x: '<path d="m6 6 12 12M18 6 6 18"/>',
   check: '<path d="m4.5 12.5 5 5L19.5 7"/>',
   camera: '<path d="M4 8.2A1.7 1.7 0 0 1 5.7 6.5H8l1.2-2h5.6l1.2 2h2.3a1.7 1.7 0 0 1 1.7 1.7V18a1.7 1.7 0 0 1-1.7 1.7H5.7A1.7 1.7 0 0 1 4 18Z"/><circle cx="12" cy="13" r="3.6"/>',
-  upload: '<path d="M12 20.5V9.2"/><path d="m7.2 13.6 4.8-4.8 4.8 4.8"/><path d="M4.5 17.5v2a1.5 1.5 0 0 0 1.5 1.5h12a1.5 1.5 0 0 0 1.5-1.5v-2"/><path d="M4.5 6h15"/>',
-  logo: '<path d="M12 3.3c3 1.8 5.6 2.6 8.2 2.7-.2 6.8-2.9 11.7-8.2 14.7C6.7 17.7 4 12.8 3.8 6c2.6-.1 5.2-.9 8.2-2.7Z"/>',
 };
 
-// Retorna a marcação SVG pronta. name = uma chave de PATHS.
-// size em px (padrão 18). className extra é opcional.
+/**
+ * Retorna a marcação SVG pronta para um ícone.
+ * @param {keyof typeof PATHS} name - chave do ícone
+ * @param {number} size - largura/altura em px (padrão 18)
+ * @param {string} className - classe CSS extra (opcional)
+ */
 export function icon(name, size = 18, className = "") {
-  const body = PATHS[name] || "";
+  const body = PATHS[name];
+  if (!body) {
+    console.warn(`[icons.js] Ícone "${name}" não existe.`);
+    return "";
+  }
   return `<svg class="icon ${className}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
 }

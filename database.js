@@ -4,20 +4,18 @@
 //
 // Responsabilidade: única camada que fala com o Firestore.
 // Nenhum outro arquivo importa funções do Firestore diretamente —
-// tudo passa por aqui, o que facilita trocar de banco no futuro.
+// tudo passa por aqui.
 //
 // Estrutura de dados no Firestore:
-//   users/{uid}                      -> perfil (name, photo, accent, animations, email)
-//   users/{uid}/transactions/{id}    -> lançamentos financeiros (receitas/despesas)
-//   users/{uid}/reserves/{id}        -> metas da reserva financeira
-//   users/{uid}/bills/{id}           -> contas fixas
-//   users/{uid}/habits/{id}          -> hábitos (inclui mapa "completions")
-//   users/{uid}/notes/{id}           -> notas
-//   users/{uid}/workouts/{id}        -> registros de treino
+//   users/{uid}                      → perfil (name, email, photo, accent, animations)
+//   users/{uid}/transactions/{id}    → lançamentos financeiros
+//   users/{uid}/reserves/{id}        → metas da reserva financeira
+//   users/{uid}/bills/{id}           → contas fixas
+//   users/{uid}/habits/{id}          → hábitos (inclui mapa "completions")
+//   users/{uid}/notes/{id}           → notas
+//   users/{uid}/workouts/{id}        → registros de treino
 //
-// Cada coleção fica DENTRO do documento do usuário (subcoleção), então
-// as regras de segurança do Firestore (abaixo, para configurar no
-// Console > Firestore Database > Regras) já isolam os dados por usuário:
+// Regras de segurança recomendadas (Firestore → Regras):
 //
 //   rules_version = '2';
 //   service cloud.firestore {
@@ -42,12 +40,11 @@ import {
   addDoc,
   deleteDoc,
   onSnapshot,
-  query
+  query,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 /* ---------------- Perfil do usuário ---------------- */
 
-// Cria o documento de perfil na primeira vez que o usuário se cadastra.
 export async function ensureUserProfile(uid, { name, email }) {
   const ref = doc(db, "users", uid);
   const snap = await getDoc(ref);
@@ -57,7 +54,7 @@ export async function ensureUserProfile(uid, { name, email }) {
       email: email || "",
       photo: "",
       accent: "gold",
-      animations: true
+      animations: true,
     });
   }
 }
@@ -66,7 +63,6 @@ export function updateUserProfile(uid, data) {
   return updateDoc(doc(db, "users", uid), data);
 }
 
-// Observa o perfil em tempo real (nome, foto, cor de destaque, animações).
 export function watchUserProfile(uid, callback) {
   return onSnapshot(doc(db, "users", uid), (snap) => {
     callback(snap.exists() ? snap.data() : null);
@@ -74,19 +70,16 @@ export function watchUserProfile(uid, callback) {
 }
 
 /* ---------------- Coleções genéricas ----------------
-   Usadas para: transactions, reserves, bills, habits, notes, workouts.
-   Isso evita repetir a mesma lógica de CRUD seis vezes. */
+   Usadas para: transactions, reserves, bills, habits, notes, workouts. */
 
 function subcollectionRef(uid, name) {
   return collection(db, "users", uid, name);
 }
 
-// Observa uma subcoleção inteira em tempo real. Retorna a função de
-// "unsubscribe" (chame quando o usuário fizer logout ou trocar de conta).
 export function watchCollection(uid, name, callback) {
   return onSnapshot(query(subcollectionRef(uid, name)), (snap) => {
     const items = [];
-    snap.forEach((d) => items.push({ id: d.id, ...d.data() }));
+    snap.forEach((docSnap) => items.push({ id: docSnap.id, ...docSnap.data() }));
     callback(items);
   });
 }

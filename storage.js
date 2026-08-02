@@ -2,10 +2,10 @@
 // storage.js
 // Local: raiz do projeto (mesma pasta do index.html)
 //
-// Responsabilidade: upload da foto de perfil para o Firebase Storage.
-// Valida tipo e tamanho do arquivo, redimensiona a imagem no navegador
-// (antes de enviar, para economizar espaço e banda) e devolve a URL
-// pública para ser salva no documento do usuário no Firestore.
+// Responsabilidade: upload da foto de perfil para o Firebase
+// Storage. Valida tipo e tamanho do arquivo, redimensiona a
+// imagem no navegador antes de enviar, e devolve a URL pública
+// para ser salva no documento do usuário no Firestore.
 // =============================================================
 
 import { storage } from "./firebase.js";
@@ -13,7 +13,7 @@ import {
   ref,
   uploadBytes,
   getDownloadURL,
-  deleteObject
+  deleteObject,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -31,11 +31,13 @@ function validateFile(file) {
   }
 }
 
-// Redimensiona a imagem (mantendo proporção) usando um <canvas> e devolve um Blob JPEG.
+// Redimensiona a imagem (mantendo proporção) usando um <canvas> e
+// devolve um Blob JPEG pronto para upload.
 function resizeImage(file) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     const objectUrl = URL.createObjectURL(file);
+
     img.onload = () => {
       URL.revokeObjectURL(objectUrl);
       let { width, height } = img;
@@ -49,14 +51,17 @@ function resizeImage(file) {
       const canvas = document.createElement("canvas");
       canvas.width = width;
       canvas.height = height;
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0, width, height);
-      canvas.toBlob((blob) => {
-        if (blob) resolve(blob);
-        else reject(new Error("Não foi possível processar a imagem."));
-      }, "image/jpeg", 0.88);
+      canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+      canvas.toBlob(
+        (blob) => (blob ? resolve(blob) : reject(new Error("Não foi possível processar a imagem."))),
+        "image/jpeg",
+        0.88
+      );
     };
-    img.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error("Arquivo de imagem inválido.")); };
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error("Arquivo de imagem inválido."));
+    };
     img.src = objectUrl;
   });
 }
@@ -74,7 +79,6 @@ export async function deleteProfilePhoto(uid) {
   try {
     await deleteObject(ref(storage, `avatars/${uid}/photo.jpg`));
   } catch (err) {
-    // Se o arquivo não existir, não há problema — apenas ignora.
     if (err && err.code !== "storage/object-not-found") throw err;
   }
 }
