@@ -174,7 +174,11 @@ img{ max-width:100%; display:block; }
   display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:35;
   opacity:0; transition:opacity var(--dur) var(--ease);
 }
-.sidebar-backdrop.show{ display:block; opacity:1; }
+.sidebar-backdrop.show{
+    display:block;
+    opacity:1;
+    pointer-events:none;
+}
 
 /* ---------- Main ---------- */
 .main{ flex:1; min-width:0; padding:30px 36px 64px; position:relative; }
