@@ -26,6 +26,7 @@ import {
   deleteItem
 } from "./database.js";
 import { uploadProfilePhoto, PhotoValidationError } from "./storage.js";
+import { icon } from "./icons.js";
 
 /* =====================================================================
    CACHE LOCAL — espelha o Firestore em memória (populado pelos listeners
@@ -274,7 +275,7 @@ function updateClock() {
   const now = new Date();
   const hour = now.getHours();
   const greet = hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite";
-  document.getElementById("greetingText").innerHTML = `<span class="wave" aria-hidden="true">👋</span> ${greet}, ${esc((profile.name || "Usuário").split(" ")[0])}`;
+  document.getElementById("greetingText").innerHTML = `${greet}, ${esc((profile.name || "Usuário").split(" ")[0])}`;
   const opts = { weekday: "long", day: "2-digit", month: "long" };
   const dateStr = now.toLocaleDateString("pt-BR", opts);
   const timeStr = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
@@ -308,7 +309,7 @@ function openTxModal(type, editId) {
   const t = editing ? editing.type : type;
   const cats = FIN_CATEGORIES[t];
   openModal(`
-    <div class="modal-head"><h3>${editing ? "Editar" : "Adicionar"} ${t === "receita" ? "receita" : "despesa"}</h3><button class="btn-ghost" onclick="closeModal()">✕</button></div>
+    <div class="modal-head"><h3>${editing ? "Editar" : "Adicionar"} ${t === "receita" ? "receita" : "despesa"}</h3><button class="btn-ghost" onclick="closeModal()">${icon('x',14)}</button></div>
     <div class="field"><label>Valor (R$)</label><input type="number" step="0.01" id="txValor" value="${editing ? editing.amount : ""}" placeholder="0,00"></div>
     <div class="field"><label>Categoria</label><select id="txCategoria">${cats.map((c) => `<option ${editing && editing.category === c ? "selected" : ""}>${c}</option>`).join("")}</select></div>
     <div class="field"><label>Data</label><input type="date" id="txData" value="${editing ? editing.date : todayISO()}"></div>
@@ -344,14 +345,14 @@ function renderFinance() {
   const sorted = [...transactions].sort((a, b) => b.date.localeCompare(a.date));
   list.innerHTML = sorted.length ? sorted.map((t) => `
     <div class="row-item">
-      <div class="ic" style="background:${t.type === "receita" ? "var(--success-dim)" : "var(--danger-dim)"}; color:${t.type === "receita" ? "var(--success)" : "var(--danger)"}">${t.type === "receita" ? "↑" : "↓"}</div>
+      <div class="ic" style="background:${t.type === "receita" ? "var(--success-dim)" : "var(--danger-dim)"}; color:${t.type === "receita" ? "var(--success)" : "var(--danger)"}">${t.type === "receita" ? icon('arrowUp',15) : icon('arrowDown',15)}</div>
       <div class="info"><div class="t1">${esc(t.category)}</div><div class="t2">${fmtDate(t.date)}${t.note ? " · " + esc(t.note) : ""}</div></div>
       <div class="amount ${t.type === "receita" ? "in" : "out"}">${t.type === "receita" ? "+" : "-"} ${fmtMoney(t.amount)}</div>
       <div class="row-actions">
-        <button class="btn-ghost" title="Editar" onclick="window.openTxModal('${t.type}','${t.id}')">✎</button>
-        <button class="btn-danger-ghost" title="Excluir" onclick="window.deleteTx('${t.id}')">🗑</button>
+        <button class="btn-ghost" title="Editar" onclick="window.openTxModal('${t.type}','${t.id}')">${icon('pencil',14)}</button>
+        <button class="btn-danger-ghost" title="Excluir" onclick="window.deleteTx('${t.id}')">${icon('trash',14)}</button>
       </div>
-    </div>`).join("") : `<div class="empty"><span class="ic">📭</span>Nenhum lançamento ainda</div>`;
+    </div>`).join("") : `<div class="empty"><span class="ic">${icon('wallet',30)}</span>Nenhum lançamento ainda</div>`;
 
   drawFinanceMonthlyChart();
 }
@@ -362,7 +363,7 @@ function renderFinance() {
 function openGoalModal(editId) {
   const editing = editId ? reserves.find((g) => g.id === editId) : null;
   openModal(`
-    <div class="modal-head"><h3>${editing ? "Editar" : "Nova"} meta</h3><button class="btn-ghost" onclick="closeModal()">✕</button></div>
+    <div class="modal-head"><h3>${editing ? "Editar" : "Nova"} meta</h3><button class="btn-ghost" onclick="closeModal()">${icon('x',14)}</button></div>
     <div class="field"><label>Nome da meta</label><input type="text" id="goalNome" value="${editing ? esc(editing.name) : ""}" placeholder="Ex: Reserva de emergência"></div>
     <div class="field-row">
       <div class="field"><label>Valor desejado (R$)</label><input type="number" step="0.01" id="goalValor" value="${editing ? editing.target : ""}"></div>
@@ -409,16 +410,16 @@ function renderReserve() {
         <div style="flex:1;">
           <div style="font-weight:700; font-size:14px;">${esc(g.name)}</div>
           <div style="font-size:11.5px; color:var(--text-faint); margin-top:2px;">${fmtMoney(g.saved)} de ${fmtMoney(g.target)}</div>
-          ${g.deadline ? `<div style="font-size:11px; color:var(--text-dim); margin-top:4px;">${dleft >= 0 ? `⏳ ${dleft} dia(s) restante(s)` : `Prazo encerrado`}</div>` : ""}
+          ${g.deadline ? `<div style="font-size:11px; color:var(--text-dim); margin-top:4px;">${dleft >= 0 ? `${dleft} dia(s) restante(s)` : `Prazo encerrado`}</div>` : ""}
         </div>
       </div>
       <div class="progress-bar" style="margin-top:14px;"><div style="width:${Math.min(pct * 100, 100)}%"></div></div>
       <div class="row-actions" style="justify-content:flex-end; margin-top:10px;">
-        <button class="btn-ghost" onclick="window.openGoalModal('${g.id}')">✎ Editar</button>
-        <button class="btn-danger-ghost" onclick="window.deleteGoal('${g.id}')">🗑 Excluir</button>
+        <button class="btn-ghost" onclick="window.openGoalModal('${g.id}')">${icon('pencil',13)} Editar</button>
+        <button class="btn-danger-ghost" onclick="window.deleteGoal('${g.id}')">${icon('trash',13)} Excluir</button>
       </div>
     </div>`;
-  }).join("") : `<div class="card empty"><span class="ic">🏦</span>Crie sua primeira meta financeira</div>`;
+  }).join("") : `<div class="card empty"><span class="ic">${icon('vault',30)}</span>Crie sua primeira meta financeira</div>`;
 }
 
 /* =====================================================================
@@ -427,7 +428,7 @@ function renderReserve() {
 function openBillModal(editId) {
   const editing = editId ? bills.find((b) => b.id === editId) : null;
   openModal(`
-    <div class="modal-head"><h3>${editing ? "Editar" : "Nova"} conta</h3><button class="btn-ghost" onclick="closeModal()">✕</button></div>
+    <div class="modal-head"><h3>${editing ? "Editar" : "Nova"} conta</h3><button class="btn-ghost" onclick="closeModal()">${icon('x',14)}</button></div>
     <div class="field"><label>Nome</label><input type="text" id="billNome" value="${editing ? esc(editing.name) : ""}" placeholder="Ex: Internet"></div>
     <div class="field-row">
       <div class="field"><label>Valor (R$)</label><input type="number" step="0.01" id="billValor" value="${editing ? editing.amount : ""}"></div>
@@ -458,8 +459,17 @@ async function saveBill(editId) {
 async function deleteBill(id) { await deleteItem(currentUid, "bills", id); }
 async function cycleBillStatus(id) {
   const b = bills.find((x) => x.id === id);
+  const previous = b.status;
   const next = b.status === "pendente" ? "pago" : b.status === "pago" ? "atrasado" : "pendente";
-  await updateItem(currentUid, "bills", id, { status: next });
+  b.status = next;
+  renderAll();
+  try {
+    await updateItem(currentUid, "bills", id, { status: next });
+  } catch (err) {
+    b.status = previous;
+    renderAll();
+    toast("Não foi possível atualizar a conta.", "danger");
+  }
 }
 function renderBills() {
   const list = document.getElementById("billsList");
@@ -468,16 +478,16 @@ function renderBills() {
     const dleft = daysBetween(b.dueDate);
     const urgent = b.status !== "pago" && dleft <= 3;
     return `<div class="row-item" style="${urgent ? "border-color:var(--danger); box-shadow:0 0 0 1px var(--danger-dim);" : ""}">
-      <div class="ic" style="background:var(--accent-dimmer); color:var(--accent);">🧾</div>
-      <div class="info"><div class="t1">${esc(b.name)} ${urgent ? "⚠️" : ""}</div><div class="t2">Vence em ${fmtDate(b.dueDate)} ${dleft >= 0 && b.status !== "pago" ? `(${dleft}d)` : ""}</div></div>
+      <div class="ic" style="background:var(--accent-dimmer); color:var(--accent);">${icon('receipt',16)}</div>
+      <div class="info"><div class="t1">${esc(b.name)} ${urgent ? `<span class="urgent-flag">${icon('alertTriangle',13)}</span>` : ""}</div><div class="t2">Vence em ${fmtDate(b.dueDate)} ${dleft >= 0 && b.status !== "pago" ? `(${dleft}d)` : ""}</div></div>
       <div class="amount">${fmtMoney(b.amount)}</div>
       <span class="badge ${b.status === "pago" ? "paid" : b.status === "atrasado" ? "late" : "pending"}" style="cursor:pointer" onclick="window.cycleBillStatus('${b.id}')">${b.status}</span>
       <div class="row-actions">
-        <button class="btn-ghost" onclick="window.openBillModal('${b.id}')">✎</button>
-        <button class="btn-danger-ghost" onclick="window.deleteBill('${b.id}')">🗑</button>
+        <button class="btn-ghost" onclick="window.openBillModal('${b.id}')">${icon('pencil',14)}</button>
+        <button class="btn-danger-ghost" onclick="window.deleteBill('${b.id}')">${icon('trash',14)}</button>
       </div>
     </div>`;
-  }).join("") : `<div class="card empty"><span class="ic">📅</span>Nenhuma conta cadastrada</div>`;
+  }).join("") : `<div class="card empty"><span class="ic">${icon('calendar',30)}</span>Nenhuma conta cadastrada</div>`;
 }
 
 /* =====================================================================
@@ -487,7 +497,7 @@ function openHabitModal(editId) {
   const editing = editId ? habits.find((h) => h.id === editId) : null;
   const selDays = editing ? editing.days : [1, 2, 3, 4, 5];
   openModal(`
-    <div class="modal-head"><h3>${editing ? "Editar" : "Novo"} hábito</h3><button class="btn-ghost" onclick="closeModal()">✕</button></div>
+    <div class="modal-head"><h3>${editing ? "Editar" : "Novo"} hábito</h3><button class="btn-ghost" onclick="closeModal()">${icon('x',14)}</button></div>
     <div class="field"><label>Nome</label><input type="text" id="habitNome" value="${editing ? esc(editing.name) : ""}" placeholder="Ex: Beber 2L de água"></div>
     <div class="field"><label>Descrição</label><textarea id="habitDesc" placeholder="Opcional">${editing ? esc(editing.description || "") : ""}</textarea></div>
     <div class="field-row">
@@ -545,12 +555,21 @@ async function toggleHabit(id, ev) {
   const h = habits.find((x) => x.id === id);
   const iso = todayISO();
   const willComplete = !(h.completions && h.completions[iso]);
-  await updateItem(currentUid, "habits", id, { [`completions.${iso}`]: willComplete });
+  if (!h.completions) h.completions = {};
+  h.completions[iso] = willComplete;
+  renderAll();
   if (willComplete && profile.animations && ev) {
     const b = document.createElement("div");
-    b.className = "burst"; b.textContent = "✅";
+    b.className = "burst"; b.innerHTML = icon("check", 22);
     b.style.left = ev.clientX - 10 + "px"; b.style.top = ev.clientY - 10 + "px";
     document.body.appendChild(b); setTimeout(() => b.remove(), 900);
+  }
+  try {
+    await updateItem(currentUid, "habits", id, { [`completions.${iso}`]: willComplete });
+  } catch (err) {
+    h.completions[iso] = !willComplete;
+    renderAll();
+    toast("Não foi possível salvar o hábito.", "danger");
   }
 }
 function renderHabits() {
@@ -569,10 +588,10 @@ function renderHabits() {
     return `<div class="card">
       <div style="display:flex; justify-content:space-between; align-items:flex-start;">
         <div><div style="font-weight:700; font-size:14px;">${esc(h.name)}</div><div style="font-size:11.5px; color:var(--text-faint); margin-top:2px;">${esc(h.description || "")}</div></div>
-        <button class="btn ${done ? "btn-accent" : ""}" onclick="window.toggleHabit('${h.id}', event)" style="padding:7px 12px;">${done ? "✓ Feito" : "Marcar"}</button>
+        <button class="btn ${done ? "btn-accent" : ""}" onclick="window.toggleHabit('${h.id}', event)" style="padding:7px 12px;">${done ? `${icon('check',13)} Feito` : "Marcar"}</button>
       </div>
       <div style="display:flex; gap:14px; margin-top:14px;">
-        <div><div class="label" style="font-size:10.5px; color:var(--text-dim);">STREAK</div><div style="font-weight:700; color:var(--accent);">🔥 ${streak}</div></div>
+        <div><div class="label" style="font-size:10.5px; color:var(--text-dim);">STREAK</div><div style="font-weight:700; color:var(--accent);">${icon('flame',13)} ${streak}</div></div>
         <div><div class="label" style="font-size:10.5px; color:var(--text-dim);">MELHOR</div><div style="font-weight:700;">${best}</div></div>
         <div><div class="label" style="font-size:10.5px; color:var(--text-dim);">CONCLUSÃO</div><div style="font-weight:700;">${Math.round((doneDays / totalDays) * 100)}%</div></div>
       </div>
@@ -580,11 +599,11 @@ function renderHabits() {
         ${last14.map((v) => `<div style="flex:1; height:20px; border-radius:4px; background:${v ? "var(--accent)" : "var(--graphite)"};"></div>`).join("")}
       </div>
       <div class="row-actions" style="justify-content:flex-end; margin-top:10px;">
-        <button class="btn-ghost" onclick="window.openHabitModal('${h.id}')">✎</button>
-        <button class="btn-danger-ghost" onclick="window.deleteHabit('${h.id}')">🗑</button>
+        <button class="btn-ghost" onclick="window.openHabitModal('${h.id}')">${icon('pencil',14)}</button>
+        <button class="btn-danger-ghost" onclick="window.deleteHabit('${h.id}')">${icon('trash',14)}</button>
       </div>
     </div>`;
-  }).join("") : `<div class="card empty"><span class="ic">✅</span>Crie seu primeiro hábito</div>`;
+  }).join("") : `<div class="card empty"><span class="ic">${icon('checkCircle',30)}</span>Crie seu primeiro hábito</div>`;
 }
 
 /* =====================================================================
@@ -593,7 +612,7 @@ function renderHabits() {
 function openNoteModal(editId) {
   const editing = editId ? notes.find((n) => n.id === editId) : null;
   openModal(`
-    <div class="modal-head"><h3>${editing ? "Editar" : "Nova"} nota</h3><button class="btn-ghost" onclick="closeModal()">✕</button></div>
+    <div class="modal-head"><h3>${editing ? "Editar" : "Nova"} nota</h3><button class="btn-ghost" onclick="closeModal()">${icon('x',14)}</button></div>
     <div class="field"><label>Título</label><input type="text" id="noteTitulo" value="${editing ? esc(editing.title) : ""}"></div>
     <div class="field"><label>Conteúdo</label><textarea id="noteConteudo" style="min-height:120px;">${editing ? esc(editing.content) : ""}</textarea></div>
     <div class="modal-actions">
@@ -615,7 +634,16 @@ async function saveNote(editId) {
 async function deleteNote(id) { await deleteItem(currentUid, "notes", id); }
 async function togglePin(id) {
   const n = notes.find((x) => x.id === id);
-  await updateItem(currentUid, "notes", id, { pinned: !n.pinned });
+  const previous = n.pinned;
+  n.pinned = !previous;
+  renderAll();
+  try {
+    await updateItem(currentUid, "notes", id, { pinned: n.pinned });
+  } catch (err) {
+    n.pinned = previous;
+    renderAll();
+    toast("Não foi possível salvar a nota.", "danger");
+  }
 }
 function renderNotes() {
   const q = (document.getElementById("noteSearch").value || "").toLowerCase();
@@ -624,13 +652,13 @@ function renderNotes() {
   filtered.sort((a, b) => (b.pinned - a.pinned) || b.date.localeCompare(a.date));
   grid.innerHTML = filtered.length ? filtered.map((n) => `
     <div class="note-card ${n.pinned ? "pinned" : ""}">
-      <span class="pin" onclick="window.togglePin('${n.id}')" style="cursor:pointer;">📌</span>
+      <span class="pin" onclick="window.togglePin('${n.id}')" style="cursor:pointer;">${icon('pin',14)}</span>
       <h4>${esc(n.title)}</h4>
       <p>${esc(n.content)}</p>
       <div class="meta"><span>${fmtDate(n.date)}</span>
-        <span class="row-actions"><button class="btn-ghost" onclick="window.openNoteModal('${n.id}')">✎</button><button class="btn-danger-ghost" onclick="window.deleteNote('${n.id}')">🗑</button></span>
+        <span class="row-actions"><button class="btn-ghost" onclick="window.openNoteModal('${n.id}')">${icon('pencil',14)}</button><button class="btn-danger-ghost" onclick="window.deleteNote('${n.id}')">${icon('trash',14)}</button></span>
       </div>
-    </div>`).join("") : `<div class="card empty" style="grid-column:1/-1;"><span class="ic">📝</span>Nenhuma nota encontrada</div>`;
+    </div>`).join("") : `<div class="card empty" style="grid-column:1/-1;"><span class="ic">${icon('fileText',30)}</span>Nenhuma nota encontrada</div>`;
 }
 let noteSearchTimer = null;
 document.getElementById("noteSearch")?.addEventListener("input", () => {
@@ -644,7 +672,7 @@ document.getElementById("noteSearch")?.addEventListener("input", () => {
 let activeGroupFilter = "Todos";
 function openWorkoutModal() {
   openModal(`
-    <div class="modal-head"><h3>Registrar exercício</h3><button class="btn-ghost" onclick="closeModal()">✕</button></div>
+    <div class="modal-head"><h3>Registrar exercício</h3><button class="btn-ghost" onclick="closeModal()">${icon('x',14)}</button></div>
     <div class="field"><label>Grupo muscular</label><select id="wkGrupo">${MUSCLE_GROUPS.map((g) => `<option>${g}</option>`).join("")}</select></div>
     <div class="field"><label>Exercício</label><input type="text" id="wkExercicio" placeholder="Ex: Supino reto"></div>
     <div class="field-row">
@@ -694,11 +722,11 @@ function renderWorkouts() {
   const sorted = [...filtered].sort((a, b) => b.date.localeCompare(a.date));
   document.getElementById("workoutHistory").innerHTML = sorted.length ? sorted.map((l) => `
     <div class="row-item">
-      <div class="ic" style="background:var(--accent-dimmer); color:var(--accent);">🏋️</div>
+      <div class="ic" style="background:var(--accent-dimmer); color:var(--accent);">${icon('dumbbell',16)}</div>
       <div class="info"><div class="t1">${esc(l.exercise)} <span style="color:var(--text-faint); font-weight:400;">· ${esc(l.group)}</span></div>
       <div class="t2">${fmtDate(l.date)} · ${l.sets}x${l.reps} · ${l.weight}kg</div></div>
-      <div class="row-actions"><button class="btn-danger-ghost" onclick="window.deleteWorkout('${l.id}')">🗑</button></div>
-    </div>`).join("") : `<div class="empty"><span class="ic">🏋️</span>Nenhum treino registrado</div>`;
+      <div class="row-actions"><button class="btn-danger-ghost" onclick="window.deleteWorkout('${l.id}')">${icon('trash',14)}</button></div>
+    </div>`).join("") : `<div class="empty"><span class="ic">${icon('dumbbell',30)}</span>Nenhum treino registrado</div>`;
 
   drawLoadChart(filtered);
 }
@@ -717,19 +745,19 @@ function renderDashboard() {
   const workoutToday = workoutLogs.find((w) => w.date === iso);
 
   document.getElementById("dashCards").innerHTML = `
-    <div class="card stat-card"><div class="top-row"><span class="label">Saldo atual</span><div class="ic-badge">💰</div></div><div class="value">${fmtMoney(balance)}</div></div>
-    <div class="card stat-card"><div class="top-row"><span class="label">Meta financeira</span><div class="ic-badge">🏦</div></div><div class="value">${mainGoal ? Math.round((mainGoal.saved / mainGoal.target) * 100) + "%" : "—"}</div><div class="delta">${mainGoal ? mainGoal.name : "nenhuma meta criada"}</div></div>
-    <div class="card stat-card"><div class="top-row"><span class="label">Hábitos hoje</span><div class="ic-badge">✅</div></div><div class="value">${habitsDoneToday}/${habitsToday.length}</div></div>
-    <div class="card stat-card"><div class="top-row"><span class="label">Treino do dia</span><div class="ic-badge">🏋️</div></div><div class="value" style="font-size:15px;">${workoutToday ? workoutToday.exercise : "Sem registro"}</div></div>
-    <div class="card stat-card"><div class="top-row"><span class="label">Notas</span><div class="ic-badge">📝</div></div><div class="value">${notes.length}</div></div>
+    <div class="card stat-card"><div class="top-row"><span class="label">Saldo atual</span><div class="ic-badge">${icon('wallet',18)}</div></div><div class="value">${fmtMoney(balance)}</div></div>
+    <div class="card stat-card"><div class="top-row"><span class="label">Meta financeira</span><div class="ic-badge">${icon('vault',18)}</div></div><div class="value">${mainGoal ? Math.round((mainGoal.saved / mainGoal.target) * 100) + "%" : "—"}</div><div class="delta">${mainGoal ? mainGoal.name : "nenhuma meta criada"}</div></div>
+    <div class="card stat-card"><div class="top-row"><span class="label">Hábitos hoje</span><div class="ic-badge">${icon('checkCircle',18)}</div></div><div class="value">${habitsDoneToday}/${habitsToday.length}</div></div>
+    <div class="card stat-card"><div class="top-row"><span class="label">Treino do dia</span><div class="ic-badge">${icon('dumbbell',18)}</div></div><div class="value" style="font-size:15px;">${workoutToday ? workoutToday.exercise : "Sem registro"}</div></div>
+    <div class="card stat-card"><div class="top-row"><span class="label">Notas</span><div class="ic-badge">${icon('fileText',18)}</div></div><div class="value">${notes.length}</div></div>
   `;
 
   const summary = [];
-  summary.push({ ic: "💰", label: "Saldo disponível", val: fmtMoney(balance) });
-  summary.push({ ic: "✅", label: "Hábitos concluídos", val: `${habitsDoneToday} de ${habitsToday.length}` });
+  summary.push({ ic: icon('wallet',16), label: "Saldo disponível", val: fmtMoney(balance) });
+  summary.push({ ic: icon('checkCircle',16), label: "Hábitos concluídos", val: `${habitsDoneToday} de ${habitsToday.length}` });
   const billsToday = bills.filter((b) => b.status !== "pago" && daysBetween(b.dueDate) <= 3 && daysBetween(b.dueDate) >= 0);
-  summary.push({ ic: "📅", label: "Contas vencendo em breve", val: `${billsToday.length}` });
-  summary.push({ ic: "📝", label: "Notas fixadas", val: `${notes.filter((n) => n.pinned).length}` });
+  summary.push({ ic: icon('calendar',16), label: "Contas vencendo em breve", val: `${billsToday.length}` });
+  summary.push({ ic: icon('pin',16), label: "Notas fixadas", val: `${notes.filter((n) => n.pinned).length}` });
   document.getElementById("todaySummary").innerHTML = summary.map((s) => `
     <div class="row-item"><div class="ic" style="background:var(--accent-dimmer); color:var(--accent);">${s.ic}</div>
     <div class="info"><div class="t1">${s.label}</div></div><div class="amount">${s.val}</div></div>`).join("");
@@ -738,11 +766,11 @@ function renderDashboard() {
   document.getElementById("upcomingBills").innerHTML = upcoming.length ? upcoming.map((b) => {
     const dleft = daysBetween(b.dueDate); const urgent = dleft <= 3;
     return `<div class="row-item" style="${urgent ? "border-color:var(--danger);" : ""}">
-      <div class="ic" style="background:${urgent ? "var(--danger-dim)" : "var(--accent-dimmer)"}; color:${urgent ? "var(--danger)" : "var(--accent)"};">🧾</div>
+      <div class="ic" style="background:${urgent ? "var(--danger-dim)" : "var(--accent-dimmer)"}; color:${urgent ? "var(--danger)" : "var(--accent)"};">${icon('receipt',16)}</div>
       <div class="info"><div class="t1">${esc(b.name)}</div><div class="t2">Vence em ${fmtDate(b.dueDate)}</div></div>
       <div class="amount">${fmtMoney(b.amount)}</div>
     </div>`;
-  }).join("") : `<div class="empty"><span class="ic">📅</span>Nenhuma conta pendente</div>`;
+  }).join("") : `<div class="empty"><span class="ic">${icon('calendar',30)}</span>Nenhuma conta pendente</div>`;
 
   drawFinanceEvolutionChart();
   drawHabitsEvolutionChart();
@@ -871,10 +899,33 @@ function renderSettings() {
 }
 async function saveProfile() {
   const name = document.getElementById("cfgName").value.trim() || "Usuário";
-  await updateUserProfile(currentUid, { name });
+  const previous = profile.name;
+  // Otimista: atualiza a tela imediatamente, sem esperar o servidor.
+  profile = { ...profile, name };
+  renderAll();
   toast("Perfil atualizado", "success");
+  try {
+    await updateUserProfile(currentUid, { name });
+  } catch (err) {
+    profile = { ...profile, name: previous };
+    renderAll();
+    toast("Não foi possível salvar o nome. Tente novamente.", "danger");
+  }
 }
-async function setAccent(key) { await updateUserProfile(currentUid, { accent: key }); }
+async function setAccent(key) {
+  const previous = profile.accent;
+  profile = { ...profile, accent: key };
+  applyAccent();
+  renderSettings();
+  try {
+    await updateUserProfile(currentUid, { accent: key });
+  } catch (err) {
+    profile = { ...profile, accent: previous };
+    applyAccent();
+    renderSettings();
+    toast("Não foi possível salvar a cor. Tente novamente.", "danger");
+  }
+}
 
 /* ---------- Upload da foto de perfil (Firebase Storage) ---------- */
 document.getElementById("avatarBig")?.addEventListener("click", () => {
@@ -913,7 +964,20 @@ function applyAccent() {
   const r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
   document.documentElement.style.setProperty("--accent-rgb", `${r},${g},${b}`);
 }
-async function toggleAnim() { await updateUserProfile(currentUid, { animations: !profile.animations }); }
+async function toggleAnim() {
+  const next = !profile.animations;
+  profile = { ...profile, animations: next };
+  document.body.dataset.anim = next ? "on" : "off";
+  renderSettings();
+  try {
+    await updateUserProfile(currentUid, { animations: next });
+  } catch (err) {
+    profile = { ...profile, animations: !next };
+    document.body.dataset.anim = !next ? "on" : "off";
+    renderSettings();
+    toast("Não foi possível salvar. Tente novamente.", "danger");
+  }
+}
 
 function exportData() {
   const backup = { profile, transactions, reserves, bills, habits, notes, workouts: workoutLogs };

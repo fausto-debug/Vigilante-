@@ -13,6 +13,7 @@ Todos os arquivos abaixo devem ficar **na mesma pasta**, na raiz do projeto/repo
 /auth.js          → cadastro, login, logout, recuperação de senha
 /database.js      → toda a leitura/escrita no Firestore
 /storage.js       → upload da foto de perfil (validação, redimensionamento e envio ao Storage)
+/icons.js         → conjunto próprio de ícones SVG (substitui os emojis em toda a interface)
 /app.js           → lógica da interface (o que antes ficava dentro de <script> no HTML)
 ```
 
