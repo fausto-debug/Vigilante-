@@ -3,10 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Vigilante — painel pessoal de produtividade: financeiro, hábitos, contas, notas e treinos.">
+<meta name="description" content="Vigilant — painel pessoal de produtividade: financeiro, hábitos, contas, notas e treinos.">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#09090a">
-<title>Vigilante — Painel Pessoal</title>
+<title>Vigilant — Painel Pessoal</title>
+
+<!-- PWA: manifest + ícones -->
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+<!-- iOS: comportamento de app instalado (tela cheia, sem barra do Safari) -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vigilant">
 
 <!-- Resource hints: adianta a conexão com os domínios do Firebase e das fontes -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -98,7 +108,7 @@
     <div class="sidebar-head">
       <div class="mark">V</div>
       <div>
-        <div class="title">Vigilante</div>
+        <div class="title">Vigilant</div>
         <div class="sub">painel pessoal</div>
       </div>
       <button class="collapse-btn" id="collapseBtn" title="Recolher menu" aria-label="Recolher menu lateral" aria-expanded="true">

@@ -41,7 +41,7 @@ import { icon } from "./icons.js";
    caso de erro).
    ===================================================================== */
 let currentUid = null;
-let profile = { name: "Usuário", photo: "", accent: "gold", animations: true };
+let profile = { name: "Usuário", photo: "", accent: "gold", animations: true, plan: "free" };
 let transactions = [];
 let reserves = [];
 let bills = [];
@@ -84,6 +84,11 @@ function esc(value) {
 }
 function byId(id) {
   return document.getElementById(id);
+}
+// Pergunta simples: o usuário está no plano pago? Usada em qualquer
+// lugar que precise liberar ou travar um recurso premium.
+function isPremium() {
+  return profile.plan === "premium";
 }
 
 function toast(message, type = "default") {
@@ -243,7 +248,7 @@ watchAuthState((user) => {
     habits = [];
     notes = [];
     workoutLogs = [];
-    profile = { name: "Usuário", photo: "", accent: "gold", animations: true };
+    profile = { name: "Usuário", photo: "", accent: "gold", animations: true, plan: "free" };
     resetShellUI();
     showScreen("screenLogin");
   }
@@ -364,6 +369,24 @@ byId("modalBackdrop")?.addEventListener("click", (e) => {
   if (e.target.id === "modalBackdrop") closeModal();
 });
 
+// Modal reutilizável, mostrado sempre que o plano gratuito bloquear algo.
+// "feature" é só o nome pra aparecer na mensagem; "reason" explica o limite.
+function openUpgradeModal(feature, reason) {
+  openModal(`
+    <div class="modal-head"><h3>Recurso do plano Premium</h3><button class="btn-ghost" onclick="closeModal()">${icon("x", 14)}</button></div>
+    <p style="color:var(--text-dim); font-size:13.5px; line-height:1.6;">${esc(reason)}</p>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">Agora não</button>
+      <button class="btn btn-accent" onclick="window.goToUpgrade()">Fazer upgrade</button>
+    </div>
+  `);
+}
+function goToUpgrade() {
+  closeModal();
+  // Por enquanto só avisa — no próximo passo isso vai abrir o checkout do Asaas.
+  toast("Em breve: checkout de assinatura", "default");
+}
+
 /* =====================================================================
    7. FINANCEIRO — transações
    ===================================================================== */
@@ -430,6 +453,13 @@ function renderFinance() {
    8. RESERVA FINANCEIRA — metas
    ===================================================================== */
 function openGoalModal(editId) {
+  // Trava do plano gratuito: só deixa criar uma meta NOVA (editId vazio)
+  // se o usuário já não tiver atingido o limite do plano free.
+  const isNewGoal = !editId;
+  if (isNewGoal && !isPremium() && reserves.length >= 1) {
+    openUpgradeModal("Reserva Financeira", "O plano gratuito permite 1 meta. Faça upgrade para criar metas ilimitadas.");
+    return;
+  }
   const editing = editId ? reserves.find((g) => g.id === editId) : null;
   openModal(`
     <div class="modal-head"><h3>${editing ? "Editar" : "Nova"} meta</h3><button class="btn-ghost" onclick="closeModal()">${icon("x", 14)}</button></div>
@@ -1199,10 +1229,21 @@ Object.assign(window, {
   openNoteModal, saveNote, deleteNote, togglePin,
   openWorkoutModal, saveWorkout, deleteWorkout, setGroupFilter,
   saveProfile, setAccent, toggleAnim, exportData, clearData,
-  closeModal,
+  closeModal, goToUpgrade,
 });
 
 /* =====================================================================
    18. INICIALIZAÇÃO
    ===================================================================== */
 updateClock();
+
+// Registra o Service Worker (PWA) — só depois que a página terminar de
+// carregar, pra não disputar banda/prioridade com os recursos essenciais.
+// "in navigator" checa se o navegador suporta a API antes de tentar usar.
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch((err) => {
+      console.error("Falha ao registrar o Service Worker:", err);
+    });
+  });
+}

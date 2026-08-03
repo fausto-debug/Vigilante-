@@ -1,4 +1,4 @@
-# Vigilante — Painel Pessoal (com Firebase)
+# Vigilant — Painel Pessoal (com Firebase)
 
 Painel pessoal de produtividade — financeiro, reserva financeira, contas,
 hábitos, notas e treinos — com tema escuro (preto, grafite e dourado),
@@ -17,6 +17,9 @@ Todos os arquivos abaixo devem ficar **na mesma pasta**, na raiz do projeto:
 /storage.js       → upload da foto de perfil (validação, redimensionamento e envio ao Storage)
 /icons.js         → conjunto próprio de ícones SVG usado em toda a interface
 /app.js           → lógica da interface — liga tudo o que está acima
+/manifest.json    → identidade da PWA (nome, cores, ícones) — permite instalar o app
+/sw.js            → Service Worker — cache do app e funcionamento offline
+/icons/           → ícones do app em vários tamanhos (PWA, iOS, Android)
 ```
 
 ## Passo 1 — Configurar o Firebase
@@ -66,6 +69,16 @@ service firebase.storage {
   }
 }
 ```
+
+## O app agora é instalável (PWA)
+
+- **Android**: ao abrir o site no Chrome, aparece a opção "Adicionar à tela inicial" (ou um banner automático). O app abre em tela cheia, com ícone próprio.
+- **iOS**: no Safari, toque em Compartilhar → "Adicionar à Tela de Início". **Precisa ser feito pelo Safari** — não funciona a partir de outro navegador ou de dentro de um app como Instagram/WhatsApp.
+- Isso já é a base necessária para o próximo passo (gerar o APK via Capacitor).
+
+### ⚠️ Ao atualizar o código no futuro
+
+Sempre que mudar `index.html`, `style.css`, `app.js` ou qualquer outro arquivo listado dentro de `APP_SHELL_FILES` no `sw.js`, **abra o `sw.js` e aumente o número em `CACHE_VERSION`** (ex: de `"v1"` para `"v2"`). Sem isso, quem já instalou o app pode continuar vendo a versão antiga por um tempo, porque o Service Worker está servindo os arquivos salvos em cache.
 
 ## Passo 5 — Publicar
 
