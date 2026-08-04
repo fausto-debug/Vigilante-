@@ -399,6 +399,30 @@ section.view.active{ display:block; animation: fadein var(--dur-slow) var(--ease
 .burst{ position:fixed; pointer-events:none; z-index:300; color:var(--accent); animation:burstUp 0.9s ease-out forwards; }
 @keyframes burstUp{ 0%{ transform:translateY(0) scale(.6); opacity:1; } 100%{ transform:translateY(-46px) scale(1.3); opacity:0; } }
 
+/* ---------- Navegador de semanas (hábitos) ---------- */
+.week-nav{ display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:18px; }
+.week-nav .week-nav-btn{
+  width:32px; height:32px; border-radius:9px; background:var(--surface-2); border:1px solid var(--border);
+  color:var(--text-dim); display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  transition:all var(--dur-fast) var(--ease);
+}
+.week-nav .week-nav-btn:hover:not(:disabled){ border-color:var(--accent); color:var(--accent); }
+.week-nav .week-nav-btn:disabled{ opacity:.35; cursor:not-allowed; }
+.week-nav .week-nav-label{ font-size:12.5px; font-weight:600; color:var(--text-dim); min-width:150px; text-align:center; }
+.week-nav .week-nav-today{
+  font-size:11.5px; color:var(--accent); background:var(--accent-dimmer); border:1px solid transparent;
+  border-radius:20px; padding:4px 11px; font-weight:600;
+}
+
+/* ---------- Fileira semanal dos hábitos (Dom a Sáb) ---------- */
+.week-strip{ display:flex; gap:6px; margin-top:14px; }
+.week-day{ flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
+.week-day .label{ font-size:9.5px; color:var(--text-faint); font-weight:700; text-transform:uppercase; }
+.week-day .box{ width:100%; height:22px; border-radius:6px; background:var(--graphite); transition:background var(--dur-fast); }
+.week-day.done .box{ background:var(--accent); }
+.week-day.today .label{ color:var(--accent); }
+.week-day.today .box{ box-shadow:0 0 0 1.5px var(--accent); }
+
 /* ---------- 17. Abas (treinos) ---------- */
 .tabs{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
 .tab{ padding:8px 15px; border-radius:20px; background:var(--surface-2); border:1px solid var(--border); font-size:12.5px; color:var(--text-dim); transition:all var(--dur-fast); }

@@ -698,18 +698,73 @@ function toggleHabit(id, ev) {
   );
 }
 
+// Controla qual semana está sendo exibida na tela de Hábitos.
+// 0 = semana atual, -1 = semana passada, -2 = retrasada, etc.
+// Nunca é permitido ir pra frente da semana atual (não existe "futuro completo").
+let habitsWeekOffset = 0;
+
+// Monta o status de UMA semana específica (deslocada por "weekOffset"
+// semanas a partir de hoje) para um hábito — cada posição corresponde
+// sempre ao mesmo dia da semana, não a uma janela de "últimos N dias".
+function weekStatus(habit, weekOffset) {
+  const completions = habit.completions || {};
+  const today = new Date();
+  const todayDow = today.getDay(); // 0 = Domingo ... 6 = Sábado
+  const sunday = new Date(today);
+  sunday.setDate(today.getDate() - todayDow + weekOffset * 7);
+
+  return WEEK_DAYS.map((label, i) => {
+    const d = new Date(sunday);
+    d.setDate(sunday.getDate() + i);
+    const key = d.toISOString().slice(0, 10);
+    return {
+      label,
+      done: !!completions[key],
+      isToday: weekOffset === 0 && i === todayDow,
+    };
+  });
+}
+
+// Texto "24/06 – 30/06" (ou "23/06 – 29/06", etc.) para o cabeçalho.
+function weekRangeLabel(weekOffset) {
+  const today = new Date();
+  const todayDow = today.getDay();
+  const sunday = new Date(today);
+  sunday.setDate(today.getDate() - todayDow + weekOffset * 7);
+  const saturday = new Date(sunday);
+  saturday.setDate(sunday.getDate() + 6);
+  const fmt = (d) => d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+  return `${fmt(sunday)} – ${fmt(saturday)}`;
+}
+
+function prevHabitsWeek() {
+  habitsWeekOffset -= 1;
+  renderHabits();
+}
+function nextHabitsWeek() {
+  if (habitsWeekOffset >= 0) return; // trava: não deixa ir pro futuro
+  habitsWeekOffset += 1;
+  renderHabits();
+}
+function goToCurrentHabitsWeek() {
+  habitsWeekOffset = 0;
+  renderHabits();
+}
+
 function renderHabits() {
+  byId("habitsWeekNav").innerHTML = `
+    <button class="week-nav-btn" onclick="window.prevHabitsWeek()" aria-label="Semana anterior">${icon("chevronLeft", 16)}</button>
+    <div class="week-nav-label">${habitsWeekOffset === 0 ? "Esta semana" : weekRangeLabel(habitsWeekOffset)}</div>
+    ${habitsWeekOffset !== 0 ? `<button class="week-nav-today" onclick="window.goToCurrentHabitsWeek()">Hoje</button>` : ""}
+    <button class="week-nav-btn" onclick="window.nextHabitsWeek()" aria-label="Próxima semana" ${habitsWeekOffset >= 0 ? "disabled" : ""} style="transform:rotate(180deg);">${icon("chevronLeft", 16)}</button>
+  `;
+
   const iso = todayISO();
   byId("habitsGrid").innerHTML = habits.length
     ? habits.map((h) => {
         const { streak, best } = habitStreak(h);
         const done = !!(h.completions && h.completions[iso]);
-        const last14 = Array.from({ length: 14 }, (_, i) => {
-          const d = new Date();
-          d.setDate(d.getDate() - (13 - i));
-          const key = d.toISOString().slice(0, 10);
-          return h.completions?.[key] ? 1 : 0;
-        });
+        const weekDays = weekStatus(h, habitsWeekOffset);
         const totalDays = Object.keys(h.completions || {}).length || 1;
         const doneDays = Object.values(h.completions || {}).filter(Boolean).length;
         return `<div class="card">
@@ -722,8 +777,12 @@ function renderHabits() {
             <div><div style="font-size:10.5px; color:var(--text-dim);">MELHOR</div><div style="font-weight:700;">${best}</div></div>
             <div><div style="font-size:10.5px; color:var(--text-dim);">CONCLUSÃO</div><div style="font-weight:700;">${Math.round((doneDays / totalDays) * 100)}%</div></div>
           </div>
-          <div style="display:flex; gap:3px; margin-top:14px;">
-            ${last14.map((v) => `<div style="flex:1; height:20px; border-radius:4px; background:${v ? "var(--accent)" : "var(--graphite)"};"></div>`).join("")}
+          <div class="week-strip">
+            ${weekDays.map((d) => `
+              <div class="week-day ${d.done ? "done" : ""} ${d.isToday ? "today" : ""}">
+                <div class="label">${d.label[0]}</div>
+                <div class="box"></div>
+              </div>`).join("")}
           </div>
           <div class="row-actions" style="justify-content:flex-end; margin-top:10px;">
             <button class="btn-ghost" onclick="window.openHabitModal('${h.id}')">${icon("pencil", 14)}</button>
@@ -1230,6 +1289,7 @@ Object.assign(window, {
   openWorkoutModal, saveWorkout, deleteWorkout, setGroupFilter,
   saveProfile, setAccent, toggleAnim, exportData, clearData,
   closeModal, goToUpgrade,
+  prevHabitsWeek, nextHabitsWeek, goToCurrentHabitsWeek,
 });
 
 /* =====================================================================
