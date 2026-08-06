@@ -1,4 +1,4 @@
-# Vigilant — Painel Pessoal (com Firebase)
+# Arkan — Painel Pessoal (com Firebase)
 
 Painel pessoal de produtividade — financeiro, reserva financeira, contas,
 hábitos, notas e treinos — com tema escuro (preto, grafite e dourado),
@@ -6,21 +6,37 @@ autenticação e banco de dados via Firebase.
 
 ## Estrutura de arquivos
 
-Todos os arquivos abaixo devem ficar **na mesma pasta**, na raiz do projeto:
+O projeto agora tem duas partes separadas: a **página de vendas** (raiz)
+e o **app** propriamente dito (subpasta `/app`).
 
 ```
-/index.html      → estrutura da página (login/cadastro/recuperação + dashboard)
-/style.css        → todo o visual (tema escuro, cores, glassmorphism)
-/firebase.js      → inicializa o Firebase (Auth + Firestore + Storage)
-/auth.js          → cadastro, login, logout, recuperação de senha
-/database.js      → toda a leitura/escrita no Firestore
-/storage.js       → upload da foto de perfil (validação, redimensionamento e envio ao Storage)
-/icons.js         → conjunto próprio de ícones SVG usado em toda a interface
-/app.js           → lógica da interface — liga tudo o que está acima
-/manifest.json    → identidade da PWA (nome, cores, ícones) — permite instalar o app
-/sw.js            → Service Worker — cache do app e funcionamento offline
-/icons/           → ícones do app em vários tamanhos (PWA, iOS, Android)
+/index.html      → página de vendas (landing page) — o que aparece pra quem ainda não é cliente
+/landing.css      → visual da página de vendas
+
+/app/index.html   → estrutura do app (login/cadastro/recuperação + dashboard)
+/app/style.css        → todo o visual do app (tema escuro, cores, glassmorphism)
+/app/firebase.js      → inicializa o Firebase (Auth + Firestore + Storage)
+/app/auth.js          → cadastro, login, logout, recuperação de senha
+/app/database.js      → toda a leitura/escrita no Firestore
+/app/storage.js       → upload da foto de perfil (validação, redimensionamento e envio ao Storage)
+/app/icons.js         → conjunto próprio de ícones SVG usado em toda a interface
+/app/app.js           → lógica da interface — liga tudo o que está acima
+/app/manifest.json    → identidade da PWA (nome, cores, ícones) — permite instalar o app
+/app/sw.js            → Service Worker — cache do app e funcionamento offline
+/app/icons/           → ícones do app em vários tamanhos (PWA, iOS, Android)
+/app/firestore.rules  → regras de segurança do banco (documentação — cole no Firebase Console)
 ```
+
+⚠️ **Importante:** o link que você já compartilhou com os amigos
+(`fausto-debug.github.io/Vigilante-/`) agora vai mostrar a **página de
+vendas**, não mais o login direto. O app passa a ficar em
+`fausto-debug.github.io/Vigilante-/app/`. Vale avisar quem já testou.
+
+> Nota: o nome do repositório no GitHub continua "Vigilante-" por
+> enquanto (decisão consciente — ver seção de rebranding). Só a marca
+> visível (nome exibido, textos, ícones) virou **Arkan**. Se um dia
+> decidirem um nome definitivo, aí sim vale renomear o repositório
+> também, e essa URL muda.
 
 ## Passo 1 — Configurar o Firebase
 
